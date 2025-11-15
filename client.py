@@ -13,7 +13,7 @@ SERVER_URL = "http://localhost:3000"
 PHONE_VIDEO_URL = "http://192.0.0.4:8080/video"   
 
 VOLUME_THRESHOLD = 0.22
-COOLDOWN_SECONDS = 2
+COOLDOWN_SECONDS = 5
 SIREN_FILE = "siren.mp3"
 
 
