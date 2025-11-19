@@ -19,8 +19,8 @@ DEVICE_ID = "Pi-Unit-001"
 SERVER_URL = "http://localhost:3000"
 PHONE_VIDEO_URL = "http://192.0.0.4:8080/video"
 
-VOLUME_THRESHOLD = 0.11
-COOLDOWN_SECONDS = 5
+VOLUME_THRESHOLD = 0.22
+COOLDOWN_SECONDS = 15
 SIREN_FILE = "siren.mp3"
 
 
@@ -66,8 +66,8 @@ def audio_thread(loop: asyncio.AbstractEventLoop):
             volume_rms = np.sqrt(np.mean(mono**2))
             now = time.time()
 
-            if volume_rms > 0.01:
-                print(f"🔊 RMS: {volume_rms:.4f}")
+            # if volume_rms > 0.01:
+            #     print(f"🔊 RMS: {volume_rms:.4f}")
 
             if volume_rms > VOLUME_THRESHOLD:
                 if now - _last_alert_time >= COOLDOWN_SECONDS:
@@ -219,7 +219,16 @@ async def start_webrtc():
 
     try:
         offer = await pc.createOffer()
+        if offer is None:
+            print("⚠️ createOffer() returned None — retrying...")
+            await asyncio.sleep(0.5)
+            return await start_webrtc()
+        
         await pc.setLocalDescription(offer)
+        if pc.localDescription is None:
+            print("⚠️ localDescription is None — retrying...")
+            await asyncio.sleep(0.5)
+            return await start_webrtc()
 
         await sio.emit("webrtc_offer", {
             "deviceId": DEVICE_ID,
