@@ -218,17 +218,8 @@ async def start_webrtc():
     await _create_peer()
 
     try:
-        offer = await pc.createOffer()
-        if offer is None:
-            print("⚠️ createOffer() returned None — retrying...")
-            await asyncio.sleep(0.5)
-            return await start_webrtc()
-        
+        offer = await pc.createOffer()       
         await pc.setLocalDescription(offer)
-        if pc.localDescription is None:
-            print("⚠️ localDescription is None — retrying...")
-            await asyncio.sleep(0.5)
-            return await start_webrtc()
 
         await sio.emit("webrtc_offer", {
             "deviceId": DEVICE_ID,
